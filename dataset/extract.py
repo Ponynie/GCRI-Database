@@ -20,10 +20,9 @@ def extract_info(html_path: str) -> pd.DataFrame:
             agg_table_rows = pd.DataFrame()
             for table_row in table_rows:
                 value_cell = table_row.find_all('td', class_='right-nowrap')
-                if len(value_cell) == 4: #If the table has 4 columns which is Type, Phase, Temp, I; discard the Temp column
-                    value_cell = value_cell.pop(2)
+                if len(value_cell) == 4: value_cell.pop(2) #If the table has 4 columns which is Type, Phase, Temp, I; discard the Temp column
                 value_cell = {column_name[i]: value_cell[i].text.strip() for i in range(len(value_cell))}
-                value_cell['I'] = int(value_cell['I'][:-1])
+                value_cell['I'] = float(value_cell['I'])
                 value_cell = pd.DataFrame(value_cell, index=[0])
                 agg_table_rows = pd.concat([agg_table_rows, value_cell], ignore_index=True)
             agg_table_rows = agg_table_rows.groupby(['Column type', 'Active phase']).agg({'I': 'mean'}).reset_index()
@@ -73,15 +72,13 @@ def process_html_files(directory: str) -> pd.DataFrame:
     return extracted_data
 
 def main():
-    directory_path = 'dataset/data-1'
+    directory_path = 'dataset/data-2'
     extracted_data = process_html_files(directory_path)
     name = extracted_data.pop('name')
     extracted_data.insert(0, 'Name', name)
-    extracted_data.to_csv('dataset/data-1.csv', index=False)
+    extracted_data.to_csv('dataset/data-2.csv', index=False)
     
-def test():
-    print(extract_info('dataset/testextract/R2.html'))
-
 main()
+
 
 
