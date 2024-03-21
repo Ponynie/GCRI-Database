@@ -3,55 +3,83 @@ import os
 import pandas as pd
 import json
 
-def extract_info(html_file):
-    with open(html_file, 'r', encoding='utf-8') as file:
+def extract_info(html_path: str) -> pd.DataFrame:
+    with open(html_path, 'r', encoding='utf-8') as file:
         html_content = file.read()
     
     soup = BeautifulSoup(html_content, 'html.parser')
-    table_row = soup.find('tr', class_='exp')
+    tables = soup.find_all('table', class_='data')
     
-    if table_row == None:
-        return None
-    else:
+    column_name = ("Column type", "Active phase", "I")
+        
+    if tables: #tables is not empty
+        full_joined_table = pd.DataFrame()
+        for table in tables:
+            table_name = table.get('aria-label')
+            table_rows = table.find_all('tr', class_='exp')
+            agg_table_rows = pd.DataFrame()
+            for table_row in table_rows:
+                value_cell = table_row.find_all('td', class_='right-nowrap')
+                value_cell = {column_name[i]: value_cell[i].text.strip() for i in range(len(value_cell))}
+                value_cell['I'] = int(value_cell['I'][:-1])
+                value_cell = pd.DataFrame(value_cell, index=[0])
+                agg_table_rows = pd.concat([agg_table_rows, value_cell], ignore_index=True)
+            agg_table_rows = agg_table_rows.groupby(['Column type', 'Active phase']).agg({'I': 'mean'}).reset_index()
+            agg_table_rows['Details'] = table_name
+            full_joined_table = pd.concat([full_joined_table, agg_table_rows], ignore_index=True)
+
         script_tags = soup.find_all('script', type='application/ld+json')
         if len(script_tags) >= 2:
             json_data = script_tags[1].string
             json_data = json.loads(json_data)
-            json_data.pop('@context')
-            json_data.pop('@type')
+            full_joined_table['name'] = json_data['name']
+            full_joined_table['molecularFormula'] = json_data['molecularFormula']
+            full_joined_table['molecularWeight'] = json_data['molecularWeight']
             
-            value_cell = table_row.find_all('td', class_='right-nowrap')
-            column_name = ("Column type", "Active phase", "I")
-            value_cell = {column_name[i]: value_cell[i].text.strip() for i in range(len(value_cell))}
-            
-            json_data.update(value_cell)
-            
-            return json_data
-        
+            if 'monoisotopicMolecularWeight' not in json_data:
+                full_joined_table['monoisotopicMolecularWeight'] = None
+            else:
+                full_joined_table['monoisotopicMolecularWeight'] = json_data['monoisotopicMolecularWeight']
+                
+            if 'inChI' not in json_data:
+                full_joined_table['inChI'] = None
+            else:
+                full_joined_table['inChI'] = json_data['inChI']
+                
+            if 'inChIKey' not in json_data:
+                full_joined_table['inChIKey'] = None
+            else:
+                full_joined_table['inChIKey'] = json_data['inChIKey']
+                
+            return full_joined_table
         else:
-            return None
-        
+            return pd.DataFrame()
+    else:
+        return pd.DataFrame()   
     
     
-def process_html_files(directory):
-    extracted_data = []
+def process_html_files(directory: str) -> pd.DataFrame:
+    extracted_data = pd.DataFrame()
     
     for file_name in os.listdir(directory):
         if file_name.endswith('.html'):
             file_path = os.path.join(directory, file_name)
             extracted_info = extract_info(file_path)
-            if extracted_info:
-                extracted_data.append(extracted_info)
+            if extracted_info.empty == False:
+                extracted_data = pd.concat([extracted_data, extracted_info], ignore_index=True)
     
     return extracted_data
 
 def main():
     directory_path = 'dataset/testextract'
-    extracted_data = pd.DataFrame(process_html_files(directory_path))
-    extracted_data['I'] = extracted_data['I'].apply(lambda x: int(x[:-1]))
+    extracted_data = process_html_files(directory_path)
+    name = extracted_data.pop('name')
+    extracted_data.insert(0, 'Name', name)
     extracted_data.to_csv('dataset/extracted_data.csv', index=False)
     
 def test():
-    extract_info('dataset/testextract/TE1.html')
+    print(extract_info('dataset/testextract/R2.html'))
 
 main()
+
+
