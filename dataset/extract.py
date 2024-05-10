@@ -71,6 +71,17 @@ def process_html_files(directory: str) -> pd.DataFrame:
     
     return extracted_data
 
+def combine_data_csv(directory: str) -> None:
+    combined_data = pd.DataFrame()
+    
+    for file_name in os.listdir(directory):
+        if file_name.endswith('.csv'):
+            file_path = os.path.join(directory, file_name)
+            data = pd.read_csv(file_path)
+            combined_data = pd.concat([combined_data, data])
+    
+    combined_data.to_csv('dataset/combined_data.csv', index=False)
+    
 def main():
     directory_path = 'dataset/data-2'
     extracted_data = process_html_files(directory_path)
@@ -78,7 +89,3 @@ def main():
     extracted_data.insert(0, 'Name', name)
     extracted_data.to_csv('dataset/data-2.csv', index=False)
     
-main()
-
-
-
