@@ -30,31 +30,8 @@ def separate_detail_column():
     # Save the modified DataFrame to a new CSV file
     df.to_csv('/Users/ponynie/Developer/Python_Code/GCRI Prediction/dataset/data.csv', index=False)
 
-def queries():
-    # Read the CSV data
-    df = pd.read_csv('/Users/ponynie/Developer/Python_Code/GCRI Prediction/dataset/data.csv')
-
-    # Filter the DataFrame based on the specified conditions
-    filtered_df = df[(df['RI Type'] == "Kovats'") & (df['Phase Polarity'] == "non-polar")]
-
-    # Aggregate the duplicates based on the specified columns
-    aggregated_df = filtered_df.groupby(['Name', 'molecularFormula', 'inChI', 'inChIKey'])['I'].mean().reset_index()
-
-    # Print the aggregated DataFrame
-    aggregated_df.head(20)
-    
-    len(aggregated_df)
-
 def queries(**kwargs):
-    """
-    Filters and aggregates the CSV data based on the specified conditions.
-
-    Args:
-        **kwargs: Key-value pairs for filtering the DataFrame.
-
-    Returns:
-        pandas.DataFrame: The aggregated DataFrame.
-    """
+    
     # Read the CSV data
     data_path = '/Users/ponynie/Developer/Python_Code/GCRI Prediction/dataset/data.csv'
     df = pd.read_csv(data_path)
