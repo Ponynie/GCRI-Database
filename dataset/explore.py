@@ -2,7 +2,7 @@ import pandas as pd
 
 def separate_detail_column():
     
-    combined_data = pd.read_csv('/Users/ponynie/Developer/Python_Code/GCRI Prediction/dataset/data-combined.csv')
+    combined_data = pd.read_csv('dataset/data-combined.csv')
 
     # Count the occurrences of unique values in the "Details" column
     details_counts = combined_data["Details"].value_counts()
@@ -28,12 +28,12 @@ def separate_detail_column():
     df = df.drop("Details", axis=1)
 
     # Save the modified DataFrame to a new CSV file
-    df.to_csv('/Users/ponynie/Developer/Python_Code/GCRI Prediction/dataset/data.csv', index=False)
+    df.to_csv('dataset/data.csv', index=False)
 
 def queries(**kwargs):
     
     # Read the CSV data
-    data_path = '/Users/ponynie/Developer/Python_Code/GCRI Prediction/dataset/data.csv'
+    data_path = 'dataset/data.csv'
     df = pd.read_csv(data_path)
 
     # Create a dictionary mapping keyword arguments to column names
