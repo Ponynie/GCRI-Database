@@ -65,3 +65,15 @@ def queries(**kwargs):
     aggregated_df = filtered_df.groupby(group_by_columns)[aggregate_column].mean().reset_index()
 
     return aggregated_df
+
+ri_types = ['Van Den Dool and Kratz', 'Normal alkane', "Kovats'", "Lee's"]
+phase_types = ['non-polar', 'polar']
+temperature_modes = ['temperature ramp', 'custom temperature program', 'isothermal']
+
+for ri_type in ri_types:
+    for phase_type in phase_types:
+        for temperature_mode in temperature_modes:
+            print("-----------------------------------------------------------")
+            print(f"RI Type: {ri_type}, Phase Polarity: {phase_type}, Temperature Mode: {temperature_mode}")
+            print(len(queries(RI_Type=ri_type, Phase_Polarity=phase_type, Temperature_Mode=temperature_mode)))
+            print("-----------------------------------------------------------")
