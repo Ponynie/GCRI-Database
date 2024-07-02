@@ -1,4 +1,14 @@
 import pandas as pd
+import os
+from rdkit import Chem
+
+ri_types = ['Van Den Dool and Kratz', 'Normal alkane', "Kovats'", "Lee's"]
+phase_types = ['non-polar', 'polar']
+temperature_modes = ['temperature ramp', 'custom temperature program', 'isothermal']
+
+def ensure_relative_path(path):
+    current_dir = os.path.dirname(__file__)
+    return os.path.join(current_dir, '..', path)
 
 def separate_detail_column():
     
@@ -33,7 +43,7 @@ def separate_detail_column():
 def queries(**kwargs):
     
     # Read the CSV data
-    data_path = 'dataset/data.csv'
+    data_path = ensure_relative_path('dataset/data.csv')
     df = pd.read_csv(data_path)
 
     # Create a dictionary mapping keyword arguments to column names
@@ -66,14 +76,36 @@ def queries(**kwargs):
 
     return aggregated_df
 
-ri_types = ['Van Den Dool and Kratz', 'Normal alkane', "Kovats'", "Lee's"]
-phase_types = ['non-polar', 'polar']
-temperature_modes = ['temperature ramp', 'custom temperature program', 'isothermal']
+def view_data_number():
+    s = 0
+    for ri_type in ri_types:
+        for phase_type in phase_types:
+            for temperature_mode in temperature_modes:
+                print("-----------------------------------------------------------")
+                print(f"RI Type: {ri_type}, Phase Polarity: {phase_type}, Temperature Mode: {temperature_mode}")
+                print(len(queries(RI_Type=ri_type, Phase_Polarity=phase_type, Temperature_Mode=temperature_mode)))
+                s += len(queries(RI_Type=ri_type, Phase_Polarity=phase_type, Temperature_Mode=temperature_mode))
+                print("-----------------------------------------------------------")
+    print(s)
 
-for ri_type in ri_types:
-    for phase_type in phase_types:
-        for temperature_mode in temperature_modes:
-            print("-----------------------------------------------------------")
-            print(f"RI Type: {ri_type}, Phase Polarity: {phase_type}, Temperature Mode: {temperature_mode}")
-            print(len(queries(RI_Type=ri_type, Phase_Polarity=phase_type, Temperature_Mode=temperature_mode)))
-            print("-----------------------------------------------------------")
+def prepare_traintest_data():
+    df = queries(RI_Type='Van Den Dool and Kratz')
+    # df.to_csv('dataset/van_den_dool_and_kratz.csv', index=False)
+    df.drop(['Name', 'molecularFormula', 'inChIKey'], axis=1, inplace=True)
+
+    # Function to convert InChI to SMILES
+    def inchi_to_smiles(inchi):
+        mol = Chem.MolFromInchi(inchi)
+        if mol:
+            return Chem.MolToSmiles(mol)
+        else:
+            return None
+
+    # Apply the function to the inChI column
+    df['SMILES'] = df['inChI'].apply(inchi_to_smiles)
+
+    df.drop('inChI', axis=1, inplace=True)
+    df.rename(columns={'I': 'rts'}, inplace=True)
+    df.rename(columns={'SMILES': 'smiles'}, inplace=True)
+    df.dropna(subset=['smiles'], inplace=True)
+    df.to_csv(ensure_relative_path('dataset/van_den_dool_and_kratz.csv'), index=False)
