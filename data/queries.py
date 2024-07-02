@@ -12,7 +12,7 @@ def ensure_relative_path(path):
 
 def separate_detail_column():
     
-    combined_data = pd.read_csv('dataset/data-combined.csv')
+    combined_data = pd.read_csv('data/data-combined.csv')
 
     # Count the occurrences of unique values in the "Details" column
     details_counts = combined_data["Details"].value_counts()
@@ -38,12 +38,12 @@ def separate_detail_column():
     df = df.drop("Details", axis=1)
 
     # Save the modified DataFrame to a new CSV file
-    df.to_csv('dataset/data.csv', index=False)
+    df.to_csv('data/data.csv', index=False)
 
 def queries(**kwargs):
     
     # Read the CSV data
-    data_path = ensure_relative_path('dataset/data.csv')
+    data_path = ensure_relative_path('data/data.csv')
     df = pd.read_csv(data_path)
 
     # Create a dictionary mapping keyword arguments to column names
@@ -90,7 +90,6 @@ def view_data_number():
 
 def prepare_traintest_data():
     df = queries(RI_Type='Van Den Dool and Kratz')
-    # df.to_csv('dataset/van_den_dool_and_kratz.csv', index=False)
     df.drop(['Name', 'molecularFormula', 'inChIKey'], axis=1, inplace=True)
 
     # Function to convert InChI to SMILES
@@ -108,4 +107,5 @@ def prepare_traintest_data():
     df.rename(columns={'I': 'rts'}, inplace=True)
     df.rename(columns={'SMILES': 'smiles'}, inplace=True)
     df.dropna(subset=['smiles'], inplace=True)
-    df.to_csv(ensure_relative_path('dataset/van_den_dool_and_kratz.csv'), index=False)
+    df.to_csv(ensure_relative_path('data/van_den_dool_and_kratz.csv'), index=False)
+    
