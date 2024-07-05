@@ -68,7 +68,7 @@ def queries(**kwargs):
     filtered_df = df[filter_conditions]
 
     # Define the constant group_by_columns (unique identifiers for each compound)
-    group_by_columns = ['Name', 'molecularFormula', 'inChI', 'inChIKey']
+    group_by_columns = ['inChI']
 
     # Aggregate the duplicates based on retention index (I) column
     aggregate_column = 'I'
@@ -89,10 +89,9 @@ def view_data_number():
     print(s)
 
 def prepare_traintest_data():
-    df = queries(RI_Type='Van Den Dool and Kratz')
-    df.drop(['Name', 'molecularFormula', 'inChIKey'], axis=1, inplace=True)
+    df = queries(RI_Type="Van Den Dool and Kratz|Normal alkane|Kovats'", Phase_Polarity="non-polar")
+    #df.drop(['molecularFormula', 'inChIKey'], axis=1, inplace=True)
 
-    # Function to convert InChI to SMILES
     def inchi_to_smiles(inchi):
         mol = Chem.MolFromInchi(inchi)
         if mol:
@@ -100,12 +99,20 @@ def prepare_traintest_data():
         else:
             return None
 
-    # Apply the function to the inChI column
     df['SMILES'] = df['inChI'].apply(inchi_to_smiles)
+    
+    print('Number of queries compounds with SMILES:', df['SMILES'].notnull().sum())
 
     df.drop('inChI', axis=1, inplace=True)
-    df.rename(columns={'I': 'rts'}, inplace=True)
+    df.rename(columns={'I': 'ri'}, inplace=True)
     df.rename(columns={'SMILES': 'smiles'}, inplace=True)
     df.dropna(subset=['smiles'], inplace=True)
-    df.to_csv(ensure_relative_path('data/van_den_dool_and_kratz.csv'), index=False)
+    df.to_csv(ensure_relative_path('data/NonPolarRI.csv'), index=False)
     
+def uniqueness_test():
+    df = pd.read_csv(ensure_relative_path('data/NonPolarRI.csv'))
+    print('Number of unique compounds:', len(df['smiles'].unique()))
+    print('Number of compounds:', len(df))
+    
+if __name__ == '__main__':
+    uniqueness_test()
