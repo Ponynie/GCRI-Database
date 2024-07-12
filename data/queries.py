@@ -89,7 +89,7 @@ def view_data_number():
     print(s)
 
 def prepare_traintest_data():
-    df = queries(RI_Type="Van Den Dool and Kratz|Normal alkane|Kovats'", Phase_Polarity="non-polar")
+    df = queries(RI_Type="Van Den Dool and Kratz'", Phase_Polarity="non-polar")
     #df.drop(['molecularFormula', 'inChIKey'], axis=1, inplace=True)
 
     def inchi_to_smiles(inchi):
@@ -115,4 +115,4 @@ def uniqueness_test():
     print('Number of compounds:', len(df))
     
 if __name__ == '__main__':
-    uniqueness_test()
+    prepare_traintest_data()
