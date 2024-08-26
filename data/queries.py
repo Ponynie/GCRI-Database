@@ -43,7 +43,7 @@ def separate_detail_column():
 def queries(**kwargs):
     
     # Read the CSV data
-    data_path = ensure_relative_path('data/data.csv')
+    data_path = ensure_relative_path('data/data-cleaned.csv')
     df = pd.read_csv(data_path)
 
     # Create a dictionary mapping keyword arguments to column names
@@ -89,8 +89,7 @@ def view_data_number():
     print(s)
 
 def prepare_traintest_data():
-    df = queries(RI_Type="Van Den Dool and Kratz'", Phase_Polarity="non-polar")
-    #df.drop(['molecularFormula', 'inChIKey'], axis=1, inplace=True)
+    df = queries(RI_Type="Van Den Dool and Kratz", Phase_Polarity="non-polar", Temperature_Mode="temperature ramp")
 
     def inchi_to_smiles(inchi):
         mol = Chem.MolFromInchi(inchi)
@@ -107,12 +106,13 @@ def prepare_traintest_data():
     df.rename(columns={'I': 'ri'}, inplace=True)
     df.rename(columns={'SMILES': 'smiles'}, inplace=True)
     df.dropna(subset=['smiles'], inplace=True)
-    df.to_csv(ensure_relative_path('data/NonPolarRI.csv'), index=False)
+    df.to_csv(ensure_relative_path('data/NP-LRI-RAMP-C.csv'), index=False)
     
 def uniqueness_test():
-    df = pd.read_csv(ensure_relative_path('data/NonPolarRI.csv'))
+    df = pd.read_csv(ensure_relative_path('data/NP-LRI-RAMP-C.csv'))
     print('Number of unique compounds:', len(df['smiles'].unique()))
     print('Number of compounds:', len(df))
     
 if __name__ == '__main__':
     prepare_traintest_data()
+    uniqueness_test()
