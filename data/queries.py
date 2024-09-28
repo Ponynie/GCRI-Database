@@ -40,10 +40,22 @@ def separate_detail_column():
     # Save the modified DataFrame to a new CSV file
     df.to_csv('data/data.csv', index=False)
 
+def view_data_number():
+    s = 0
+    for ri_type in ri_types:
+        for phase_type in phase_types:
+            for temperature_mode in temperature_modes:
+                print("-----------------------------------------------------------")
+                print(f"RI Type: {ri_type}, Phase Polarity: {phase_type}, Temperature Mode: {temperature_mode}")
+                print(len(queries(RI_Type=ri_type, Phase_Polarity=phase_type, Temperature_Mode=temperature_mode)))
+                s += len(queries(RI_Type=ri_type, Phase_Polarity=phase_type, Temperature_Mode=temperature_mode))
+                print("-----------------------------------------------------------")
+    print(s)
+
 def queries(**kwargs):
     
     # Read the CSV data
-    data_path = ensure_relative_path('data/data-cleaned.csv')
+    data_path = ensure_relative_path('data/data-cleaned.csv') #* IMPORTANT
     df = pd.read_csv(data_path)
 
     # Create a dictionary mapping keyword arguments to column names
@@ -76,20 +88,8 @@ def queries(**kwargs):
 
     return aggregated_df
 
-def view_data_number():
-    s = 0
-    for ri_type in ri_types:
-        for phase_type in phase_types:
-            for temperature_mode in temperature_modes:
-                print("-----------------------------------------------------------")
-                print(f"RI Type: {ri_type}, Phase Polarity: {phase_type}, Temperature Mode: {temperature_mode}")
-                print(len(queries(RI_Type=ri_type, Phase_Polarity=phase_type, Temperature_Mode=temperature_mode)))
-                s += len(queries(RI_Type=ri_type, Phase_Polarity=phase_type, Temperature_Mode=temperature_mode))
-                print("-----------------------------------------------------------")
-    print(s)
-
-def prepare_traintest_data():
-    df = queries(RI_Type="Van Den Dool and Kratz", Phase_Polarity="non-polar", Temperature_Mode="temperature ramp")
+def prepare_traintest_data(saved_data_path, **kwargs):
+    df = queries(**kwargs)
 
     def inchi_to_smiles(inchi):
         mol = Chem.MolFromInchi(inchi)
@@ -103,16 +103,22 @@ def prepare_traintest_data():
     print('Number of queries compounds with SMILES:', df['SMILES'].notnull().sum())
 
     df.drop('inChI', axis=1, inplace=True)
-    df.rename(columns={'I': 'ri'}, inplace=True)
-    df.rename(columns={'SMILES': 'smiles'}, inplace=True)
+    df.rename(columns={'I': 'ri', 'SMILES': 'smiles'}, inplace=True)
     df.dropna(subset=['smiles'], inplace=True)
-    df.to_csv(ensure_relative_path('data/NP-LRI-RAMP-C.csv'), index=False)
+    df.to_csv(ensure_relative_path(saved_data_path), index=False) # data/NP-LRI-RAMP-C.csv
+    return saved_data_path
     
-def uniqueness_test():
-    df = pd.read_csv(ensure_relative_path('data/NP-LRI-RAMP-C.csv'))
+def uniqueness_test(saved_data_path):
+    df = pd.read_csv(ensure_relative_path(saved_data_path))
     print('Number of unique compounds:', len(df['smiles'].unique()))
     print('Number of compounds:', len(df))
     
 if __name__ == '__main__':
-    prepare_traintest_data()
-    uniqueness_test()
+    query_params = {
+        'RI_Type': "Kovats'",
+        'Phase_Polarity': "polar",
+        'Temperature_Mode': "isothermal"
+    }
+    
+    saved_data_path = prepare_traintest_data(saved_data_path='data/P-KV-ISO-C.csv', **query_params)
+    uniqueness_test(saved_data_path)

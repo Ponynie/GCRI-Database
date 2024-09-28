@@ -3,7 +3,7 @@ from rdkit import Chem
 from collections import defaultdict
 
 # Load your CSV file
-df = pd.read_csv('data/NP-LRI-RAMP-G-C.csv')
+df = pd.read_csv('data/P-KV-ISO-G-C.csv')
 
 # Initialize a dictionary to count unique molecules containing each atom type
 atom_molecule_count = defaultdict(int)
@@ -31,4 +31,4 @@ def molecule_has_valid_atoms(smiles):
 filtered_df = df[df['smiles'].apply(molecule_has_valid_atoms)]
 
 # Save the filtered data to a new CSV file
-filtered_df.to_csv('data/NP-LRI-RAMP-G-C-P.csv', index=False)
+filtered_df.to_csv('data/P-KV-ISO-G-C-P.csv', index=False)
