@@ -1,4 +1,4 @@
-SMILES,Alkane RI,PEG-2I (values for compounds with -999 could not be calculated)
+smiles,ri,ri_2
 Clc1c(-n2c(N)c([SH0](=O)C(F)(F)F)c(C#N)n2)c(Cl)cc(C(F)(F)F)c1,2047.8260869565217,41.79886621234576
 ClC(Cl)=C[C@@H]1[C@@H](C(=O)OCc2c(F)c(F)cc(F)c2F)C1(C)C,1900.0,34.73171686719481
 ClC(Cl)(SN(S(=O)(=O)N(C)C)c1ccc(C)cc1)F,2052.1739130434785,89.95011310387989

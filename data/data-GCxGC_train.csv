@@ -1,4 +1,4 @@
-SMILES,Alkane RI,PEG-2I (values for compounds with -999 could not be calculated)
+smiles,ri,ri_2
 Brc1c(C(F)(F)F)n(COCC)c(c1C#N)-c1ccc(Cl)cc1,2210.0,65.20300979868038
 ClC(Cl)(SN(S(=O)(=O)N(C)C)c1ccccc1)F,1947.8260869565217,94.13805345656193
 ClC(C(=O)OCC)Cc1c(Cl)cc(F)c(N2C(=O)N(C(F)F)C(C)=N2)c1,2320.0,67.05536803159744
