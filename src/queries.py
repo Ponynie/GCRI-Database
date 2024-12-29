@@ -6,10 +6,6 @@ ri_types = ['Van Den Dool and Kratz', 'Normal alkane', "Kovats'", "Lee's"]
 phase_types = ['non-polar', 'polar']
 temperature_modes = ['temperature ramp', 'custom temperature program', 'isothermal']
 
-def ensure_relative_path(path):
-    current_dir = os.path.dirname(__file__)
-    return os.path.join(current_dir, '..', path)
-
 def separate_detail_column():
     
     combined_data = pd.read_csv('data/data-combined.csv')
@@ -47,15 +43,15 @@ def view_data_number():
             for temperature_mode in temperature_modes:
                 print("-----------------------------------------------------------")
                 print(f"RI Type: {ri_type}, Phase Polarity: {phase_type}, Temperature Mode: {temperature_mode}")
-                print(len(queries(RI_Type=ri_type, Phase_Polarity=phase_type, Temperature_Mode=temperature_mode)))
-                s += len(queries(RI_Type=ri_type, Phase_Polarity=phase_type, Temperature_Mode=temperature_mode))
+                print(len(queries(cleaned=False, RI_Type=ri_type, Phase_Polarity=phase_type, Temperature_Mode=temperature_mode)))
+                s += len(queries(cleaned=False, RI_Type=ri_type, Phase_Polarity=phase_type, Temperature_Mode=temperature_mode))
                 print("-----------------------------------------------------------")
     print(s)
 
-def queries(**kwargs):
+def queries(cleaned=True, **kwargs):
     
     # Read the CSV data
-    data_path = ensure_relative_path('data/data-cleaned.csv') #* IMPORTANT
+    data_path = 'data/data-cleaned.csv' if cleaned else 'data/data.csv' #* IMPORTANT
     df = pd.read_csv(data_path)
 
     # Create a dictionary mapping keyword arguments to column names
@@ -89,7 +85,7 @@ def queries(**kwargs):
     return aggregated_df
 
 def prepare_traintest_data(saved_data_path, **kwargs):
-    df = queries(**kwargs)
+    df = queries(cleaned=True, **kwargs)
 
     def inchi_to_smiles(inchi):
         mol = Chem.MolFromInchi(inchi)
@@ -105,11 +101,11 @@ def prepare_traintest_data(saved_data_path, **kwargs):
     df.drop('inChI', axis=1, inplace=True)
     df.rename(columns={'I': 'ri', 'SMILES': 'smiles'}, inplace=True)
     df.dropna(subset=['smiles'], inplace=True)
-    df.to_csv(ensure_relative_path(saved_data_path), index=False) # data/NP-LRI-RAMP-C.csv
+    df.to_csv(saved_data_path, index=False) # data/NP-LRI-RAMP-C.csv
     return saved_data_path
     
 def uniqueness_test(saved_data_path):
-    df = pd.read_csv(ensure_relative_path(saved_data_path))
+    df = pd.read_csv(saved_data_path)
     print('Number of unique compounds:', len(df['smiles'].unique()))
     print('Number of compounds:', len(df))
     
