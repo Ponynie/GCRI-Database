@@ -111,10 +111,11 @@ def uniqueness_test(saved_data_path):
     
 if __name__ == '__main__':
     query_params = {
-        'RI_Type': "Kovats'",
+        'RI_Type': "Van Den Dool and Kratz",
         'Phase_Polarity': "polar",
-        'Temperature_Mode': "isothermal"
+        'Temperature_Mode': "temperature ramp"
     }
+    print(f'Querying data with parameters: {query_params}')
     
-    saved_data_path = prepare_traintest_data(saved_data_path='data/P-KV-ISO-C.csv', **query_params)
+    saved_data_path = prepare_traintest_data(saved_data_path='data/P-VAN-RAMP-C.csv', **query_params)
     uniqueness_test(saved_data_path)

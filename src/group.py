@@ -46,7 +46,7 @@ def handle_rare_groups(df, min_samples=2):
     return df
 
 # Load your data
-df = pd.read_csv('data/P-KV-ISO-C.csv')
+df = pd.read_csv('data/ALL-KVVAN-ISORAMP.csv')
 
 # Add molecular groups
 df_with_groups = add_molecular_group(df)
@@ -58,4 +58,4 @@ df_with_groups = df_with_groups[df_with_groups['group'] != 'invalid_smiles']
 df_with_groups = handle_rare_groups(df_with_groups, min_samples=10)
 
 # Save the result with groups
-df_with_groups.to_csv('data/P-KV-ISO-G-C.csv', index=False)
+df_with_groups.to_csv('data/ALL-KVVAN-ISORAMP-G-C.csv', index=False)
