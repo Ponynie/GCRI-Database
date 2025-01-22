@@ -7,7 +7,7 @@ data_dir = 'data'
 splitted_dir = 'data/splitted'
 
 # Function to process and split CSV files
-def process_and_split_csv(file_path, output_dir, suffix='-TEST'):
+def process_and_split_csv(file_path, output_dir):
     # Load the CSV file
     data = pd.read_csv(file_path)
 
@@ -21,8 +21,8 @@ def process_and_split_csv(file_path, output_dir, suffix='-TEST'):
 
     # Determine output file names
     base_name = os.path.basename(file_path)
-    train_output_path = os.path.join(output_dir, base_name)
-    test_output_path = os.path.join(output_dir, base_name.replace('.csv', f'{suffix}.csv'))
+    train_output_path = os.path.join(output_dir, base_name.replace('.csv', '-TRAIN.csv'))
+    test_output_path = os.path.join(output_dir, base_name.replace('.csv', '-TEST.csv'))
 
     # Save the split datasets
     os.makedirs(output_dir, exist_ok=True)
